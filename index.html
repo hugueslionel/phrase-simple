@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Constructeur de Phrases</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        h1 {
+            color: #4a90e2;
+            margin-bottom: 30px;
+        }
+        
+        /* Section histoire */
+        #story-section {
+            background-color: #f0f8ff;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border: 2px solid #4a90e2;
+        }
+        
+        #story-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+        
+        #story-image {
+            max-width: 300px;
+            max-height: 200px;
+            border: 3px solid #4a90e2;
+            border-radius: 10px;
+            object-fit: contain;
+        }
+        
+        .audio-button {
+            background-color: #ff6b6b;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            cursor: pointer;
+            font-size: 24px;
+            color: white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+        }
+        
+        .audio-button:hover {
+            transform: scale(1.1);
+        }
+        
+        .audio-button:active {
+            transform: scale(0.95);
+        }
+        
+        /* Section construction de phrase */
+        #sentence-section {
+            background-color: #fff8e1;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border: 2px solid #ffc107;
+        }
+        
+        #sentence-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .word-cell {
+            width: 120px;
+            height: 120px;
+            border: 3px solid #ccc;
+            border-radius: 10px;
+            background-color: white;
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .word-cell img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+        }
+        
+        .color-indicator {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+        
+        .yellow { background-color: #ffeb3b; }
+        .blue { background-color: #2196f3; }
+        .red { background-color: #f44336; }
+        
+        .delete-btn {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            font-size: 14px;
+            cursor: pointer;
+            display: none;
+        }
+        
+        .word-cell:hover .delete-btn {
+            display: block;
+        }
+        
+        .small-audio-button {
+            background-color: #4caf50;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            font-size: 16px;
+            color: white;
+            margin-left: 10px;
+        }
+        
+        /* Section sélection d'images */
+        #selection-section {
+            background-color: #e8f5e9;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border: 2px solid #4caf50;
+        }
+        
+        #image-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .selectable-image {
+            width: 80px;
+            height: 80px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            cursor: pointer;
+            object-fit: contain;
+            background-color: white;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        
+        .selectable-image:hover {
+            transform: scale(1.05);
+            border-color: #4caf50;
+        }
+        
+        /* Boutons de contrôle */
+        #controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .control-button {
+            padding: 12px 24px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .next-button {
+            background-color: #4a90e2;
+            color: white;
+        }
+        
+        .next-button:hover {
+            background-color: #3a70c2;
+        }
+        
+        .clear-button {
+            background-color: #ff9800;
+            color: white;
+        }
+        
+        .clear-button:hover {
+            background-color: #e68900;
+        }
+        
+        .instructions {
+            color: #666;
+            font-style: italic;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Construis ta phrase !</h1>
+    
+    <!-- Section histoire -->
+    <section id="story-section">
+        <h2>Histoire</h2>
+        <div id="story-container">
+            <img id="story-image" src="" alt="Image de l'histoire">
+            <button id="story-audio" class="audio-button">🔊</button>
+        </div>
+    </section>
+    
+    <!-- Section construction de phrase -->
+    <section id="sentence-section">
+        <h2>Ta phrase</h2>
+        <p class="instructions">Clique sur les emplacements pour ajouter des images</p>
+        <div id="sentence-container">
+            <div class="word-cell" data-color="yellow" data-position="0">
+                <div class="color-indicator yellow"></div>
+            </div>
+            <div class="word-cell" data-color="blue" data-position="1">
+                <div class="color-indicator blue"></div>
+            </div>
+            <div class="word-cell" data-color="red" data-position="2">
+                <div class="color-indicator red"></div>
+            </div>
+            <div class="word-cell" data-color="yellow" data-position="3">
+                <div class="color-indicator yellow"></div>
+            </div>
+            <div class="word-cell" data-color="blue" data-position="4">
+                <div class="color-indicator blue"></div>
+            </div>
+            <button id="read-sentence" class="small-audio-button">🔊</button>
+        </div>
+    </section>
+    
+    <!-- Section sélection d'images -->
+    <section id="selection-section">
+        <h2>Choisis tes images</h2>
+        <p class="instructions">Clique sur une case de ta phrase puis sur une image</p>
+        <div id="image-grid"></div>
+    </section>
+    
+    <!-- Boutons de contrôle -->
+    <div id="controls">
+        <button id="clear-sentence" class="control-button clear-button">Effacer la phrase</button>
+        <button id="next-story" class="control-button next-button">Histoire suivante</button>
+    </div>
+    
+    <script>
+        // Configuration
+        const totalStories = 10;
+        const imagesByColor = {
+            yellow: 5,
+            red: 10,
+            blue: 20
+        };
+        
+        // État de l'application
+        let currentStory = 1;
+        let selectedCell = null;
+        let sentenceImages = [null, null, null, null, null];
+        
+        // Éléments DOM
+        const storyImage = document.getElementById('story-image');
+        const storyAudioBtn = document.getElementById('story-audio');
+        const wordCells = document.querySelectorAll('.word-cell');
+        const imageGrid = document.getElementById('image-grid');
+        const readSentenceBtn = document.getElementById('read-sentence');
+        const clearSentenceBtn = document.getElementById('clear-sentence');
+        const nextStoryBtn = document.getElementById('next-story');
+        
+        // Fonction pour charger une histoire
+        function loadStory(storyNumber) {
+            const imagePath = `images/hist${storyNumber}.jpeg`;
+            storyImage.src = imagePath;
+            storyImage.alt = `Histoire ${storyNumber}`;
+        }
+        
+        // Fonction pour jouer un son
+        function playSound(soundPath) {
+            const audio = new Audio(soundPath);
+            audio.play().catch(error => {
+                console.log('Erreur lors de la lecture du son:', error);
+            });
+        }
+        
+        // Fonction pour afficher les images d'une couleur
+        function showImagesForColor(color) {
+            imageGrid.innerHTML = '';
+            const count = imagesByColor[color];
+            const colorPrefix = color === 'yellow' ? 'jau' : 
+                              color === 'red' ? 'rou' : 'bleu';
+            
+            for (let i = 1; i <= count; i++) {
+                const img = document.createElement('img');
+                img.src = `images/${colorPrefix}${i}.jpeg`;
+                img.className = 'selectable-image';
+                img.dataset.imageName = `${colorPrefix}${i}`;
+                
+                img.addEventListener('click', () => {
+                    if (selectedCell !== null) {
+                        placeImageInCell(selectedCell, img.src, img.dataset.imageName);
+                        clearSelection();
+                    }
+                });
+                
+                imageGrid.appendChild(img);
+            }
+        }
+        
+        // Fonction pour placer une image dans une cellule
+        function placeImageInCell(cellIndex, imageSrc, imageName) {
+            const cell = wordCells[cellIndex];
+            
+            // Nettoyer la cellule
+            const existingImg = cell.querySelector('img:not(.color-indicator)');
+            const existingBtn = cell.querySelector('.delete-btn');
+            if (existingImg) existingImg.remove();
+            if (existingBtn) existingBtn.remove();
+            
+            // Ajouter la nouvelle image
+            const img = document.createElement('img');
+            img.src = imageSrc;
+            cell.appendChild(img);
+            
+            // Ajouter le bouton de suppression
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'delete-btn';
+            deleteBtn.textContent = '×';
+            deleteBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                removeImageFromCell(cellIndex);
+            });
+            cell.appendChild(deleteBtn);
+            
+            // Sauvegarder dans l'état
+            sentenceImages[cellIndex] = imageName;
+        }
+        
+        // Fonction pour supprimer une image d'une cellule
+        function removeImageFromCell(cellIndex) {
+            const cell = wordCells[cellIndex];
+            const img = cell.querySelector('img:not(.color-indicator)');
+            const deleteBtn = cell.querySelector('.delete-btn');
+            
+            if (img) img.remove();
+            if (deleteBtn) deleteBtn.remove();
+            
+            sentenceImages[cellIndex] = null;
+        }
+        
+        // Fonction pour effacer la sélection
+        function clearSelection() {
+            wordCells.forEach(cell => cell.classList.remove('selected'));
+            selectedCell = null;
+            imageGrid.innerHTML = '';
+        }
+        
+        // Fonction pour lire la phrase
+        function readSentence() {
+            const validImages = sentenceImages.filter(img => img !== null);
+            if (validImages.length === 0) {
+                alert('Ajoute des images à ta phrase pour la lire !');
+                return;
+            }
+            
+            let delay = 0;
+            sentenceImages.forEach(imageName => {
+                if (imageName) {
+                    setTimeout(() => {
+                        playSound(`sons/${imageName}.mp3`);
+                    }, delay);
+                    delay += 1000; // 1 seconde entre chaque mot
+                }
+            });
+        }
+        
+        // Fonction pour effacer la phrase
+        function clearSentence() {
+            wordCells.forEach((cell, index) => {
+                removeImageFromCell(index);
+            });
+            clearSelection();
+        }
+        
+        // Fonction pour passer à l'histoire suivante
+        function nextStory() {
+            currentStory = currentStory >= totalStories ? 1 : currentStory + 1;
+            loadStory(currentStory);
+            clearSentence();
+        }
+        
+        // Gestionnaires d'événements
+        storyAudioBtn.addEventListener('click', () => {
+            playSound(`sons/hist${currentStory}.mp3`);
+        });
+        
+        wordCells.forEach((cell, index) => {
+            cell.addEventListener('click', () => {
+                clearSelection();
+                cell.classList.add('selected');
+                selectedCell = index;
+                
+                const color = cell.dataset.color;
+                showImagesForColor(color);
+            });
+        });
+        
+        readSentenceBtn.addEventListener('click', readSentence);
+        clearSentenceBtn.addEventListener('click', clearSentence);
+        nextStoryBtn.addEventListener('click', nextStory);
+        
+        // Style pour la cellule sélectionnée
+        const style = document.createElement('style');
+        style.textContent = `
+            .word-cell.selected {
+                border-color: #4caf50;
+                box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Initialisation
+        loadStory(currentStory);
+    </script>
+</body>
+</html>
